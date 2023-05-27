@@ -43,7 +43,7 @@ public class PlayingActivity extends AppCompatActivity {
     }
 
     public void restart_listener(){
-//        ChessBoardView chessBoardView = (ChessBoardView) findViewById(R.id.imageView4);
-//        chessBoardView.reset();
+        ChessBoardView chessBoard = findViewById(R.id.imageView4);
+        chessBoard.reset();
     }
 }

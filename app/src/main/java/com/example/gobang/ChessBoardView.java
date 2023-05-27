@@ -7,7 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -16,33 +15,26 @@ import android.view.View;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ChessBoardView extends View {
 
     Context context;
-    private Paint mBitmapPaint;
-    private Bitmap mBitmap, background;
-    private Canvas mCanvas;
+    private final Paint mBitmapPaint;
+    private final Bitmap background;
     //畫筆
-    private Paint circlePaint, mPaint;
-    //暫存使用者手指的X,Y座標
-    private int curChessX, curChessY;
-    private int curRound;
-
-    private ArrayList<ChessItem> chessItems;
+    private final Paint circlePaint;
+    private int[][] chessMap;
     private static final float TOUCH_TOLERANCE = 4;
-
+    private float gridSize;
+    private int round=0;
     public ChessBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
 
         // chess
-        curChessY = 0;
-        curChessX = 0;
-        curRound = 0;
-        chessItems = new ArrayList<ChessItem>();
-
+        gridSize =getHeight()/13;
+        chessMap=new int[13][13];
+        round=0;
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         //畫點選畫面時顯示的圈圈
         circlePaint = new Paint();
@@ -52,15 +44,14 @@ public class ChessBoardView extends View {
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(4f);
 
-        background = BitmapFactory.decodeResource(getResources(), R.drawable.chess_board);
+        background = BitmapFactory.decodeResource(getResources(), R.drawable.chessboard);
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         //初始化空畫布
-        mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
+        gridSize =getHeight()/13;
     }
 
     @Override
@@ -74,17 +65,21 @@ public class ChessBoardView extends View {
         //到這邊
 
         //畫圓圈圈
-        for(ChessItem chess: chessItems){
-            circlePaint.setColor(chess.getChessColor());
-            canvas.drawCircle(chess.getChessX(), chess.getChessY(), 30, circlePaint);
+        for(int x=0;x<13;x++){
+            for(int y=0;y<13;y++){
+                if(chessMap[x][y]!=0){
+                    circlePaint.setColor(chessMap[x][y]);
+                    canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, 30, circlePaint);
+                }
+            }
         }
     }
 
     /**覆寫:偵測使用者觸碰螢幕的事件*/
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        int x = (int) event.getX();
-        int y = (int) event.getY();
+        int x = (int) (event.getX() / gridSize);
+        int y = (int) (event.getY() / gridSize);
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
                 set_chess_point(x, y);
@@ -97,27 +92,20 @@ public class ChessBoardView extends View {
     }
 
     private void set_chess_point(int x, int y) {
-        curChessX = x;
-        curChessY = y;
-        curRound = ChessItem.chessCount;
-        if(curRound%2==0){
-            ChessItem newChess = new ChessItem(x,y,Color.BLACK);
-            chessItems.add(newChess);
+        if(chessMap[x][y]==0) {
+            if ((round++) % 2 == 0) {
+                chessMap[x][y] = Color.BLACK;
+            } else {
+                chessMap[x][y] = Color.WHITE;
+            }
+            Log.i("TAG", "chess count: (" + round + ")");
+            Log.i("TAG", "moving: (" + x + ", " + y + ")");
         }
-        else {
-            ChessItem newChess = new ChessItem(x,y,Color.WHITE);
-            chessItems.add(newChess);
-        }
-        Log.i("TAG", "chess count: (" + ChessItem.chessCount + ")");
-        Log.i("TAG", "moving: (" + x + ", " + y + ")");
     }
 
     public void reset(){
-        this.curChessY = 0;
-        this.curChessX = 0;
-        this.curRound = 0;
-        this.chessItems = null;
-        background = BitmapFactory.decodeResource(getResources(), R.drawable.chess_board);
+        round=0;
+        chessMap=new int[13][13];
         invalidate();
     }
 }
