@@ -17,17 +17,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.083" />
-    <ImageView
+
+    <com.example.gobang.ChessBoardView
         android:id="@+id/imageView4"
-        android:layout_width="wrap_content"
-        android:layout_height="602dp"
+        android:layout_width="match_parent"
+        android:layout_height="622dp"
         android:foregroundGravity="center_vertical"
-        app:srcCompat="@drawable/chess_board"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="-2dp"
-        tools:layout_editor_absoluteY="96dp" />
+        app:srcCompat="@drawable/chess_board"
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/button"

@@ -1,6 +1,7 @@
 package com.example.gobang;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,10 +24,10 @@ public class PlayingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playing);
-
-        Button button_restart;
-        button_restart = findViewById(R.id.button);
-//      button_restart.setOnClickListener(v->{ canvasView.clear(); });
+//
+//
+//        Button button_restart;
+//        button_restart = findViewById(R.id.button);
     }
 
     @Override
@@ -35,12 +36,14 @@ public class PlayingActivity extends AppCompatActivity {
         int y = (int) event.getY();
         switch (event.getAction()){
             case MotionEvent.ACTION_UP:
-                Log.i("TAG", "moving: (" + x + ", " + y + ")");
+                Log.i("TAG", "touch: (" + x + ", " + y + ")");
                 break;
         }
         return true;
     }
 
-
-
+    public void restart_listener(){
+//        ChessBoardView chessBoardView = (ChessBoardView) findViewById(R.id.imageView4);
+//        chessBoardView.reset();
+    }
 }
