@@ -42,7 +42,7 @@ public class PlayingActivity extends AppCompatActivity {
         return true;
     }
 
-    public void restart_listener(){
+    public void restart_listener(View view){
         ChessBoardView chessBoard = findViewById(R.id.imageView4);
         chessBoard.reset();
     }
