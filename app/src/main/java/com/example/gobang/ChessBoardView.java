@@ -1,7 +1,9 @@
 package com.example.gobang;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -12,9 +14,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import android.view.WindowManager;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
 
 public class ChessBoardView extends View {
 
@@ -23,18 +25,15 @@ public class ChessBoardView extends View {
     private final Bitmap background;
     //畫筆
     private final Paint circlePaint;
-    private int[][] chessMap;
-    private static final float TOUCH_TOLERANCE = 4;
     private float gridSize;
-    private int round=0;
+    private final Gobang game;
+    private PlayingActivity parent;
     public ChessBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-
         // chess
         gridSize =getHeight()/13;
-        chessMap=new int[13][13];
-        round=0;
+        game=new Gobang();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         //畫點選畫面時顯示的圈圈
         circlePaint = new Paint();
@@ -45,6 +44,11 @@ public class ChessBoardView extends View {
         circlePaint.setStrokeWidth(4f);
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.chessboard);
+    }
+
+    public void setParent(PlayingActivity parent) {
+        this.parent = parent;
+
     }
 
     @Override
@@ -67,10 +71,8 @@ public class ChessBoardView extends View {
         //畫圓圈圈
         for(int x=0;x<13;x++){
             for(int y=0;y<13;y++){
-                if(chessMap[x][y]!=0){
-                    circlePaint.setColor(chessMap[x][y]);
-                    canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, 30, circlePaint);
-                }
+                circlePaint.setColor(game.getChessColor(x,y));
+                canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, 30, circlePaint);
             }
         }
     }
@@ -82,30 +84,24 @@ public class ChessBoardView extends View {
         int y = (int) (event.getY() / gridSize);
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
-                set_chess_point(x, y);
-                invalidate();
+                //下一子並且看有沒有人贏
+                parent.showMessageIfWin(game.placeChess(x,y));
+                //現在是誰
+                if(game.getRound()%2==0){
+                    parent.setTurnText("現在輪到:黑");
+                }else{
+                    parent.setTurnText("現在輪到:白");
+                }
                 break;
         }
+
         invalidate();
         return true;
-
-    }
-
-    private void set_chess_point(int x, int y) {
-        if(chessMap[x][y]==0) {
-            if ((round++) % 2 == 0) {
-                chessMap[x][y] = Color.BLACK;
-            } else {
-                chessMap[x][y] = Color.WHITE;
-            }
-            Log.i("TAG", "chess count: (" + round + ")");
-            Log.i("TAG", "moving: (" + x + ", " + y + ")");
-        }
     }
 
     public void reset(){
-        round=0;
-        chessMap=new int[13][13];
+        game.reset();
+        parent.setTurnText("現在輪到:黑");
         invalidate();
     }
 }
