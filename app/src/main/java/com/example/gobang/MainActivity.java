@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import com.example.gobang.peer.BlackPeer;
+import com.example.gobang.peer.WhitePeer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,6 +19,14 @@ public class MainActivity extends AppCompatActivity {
     public void playing_listener(View view)
     {
         Intent attractionIntent = new Intent(this, PlayingActivity.class);
+        startActivity(attractionIntent);
+    }
+    public void black(View view){
+        Intent attractionIntent = new Intent(this, BlackPeer.class);
+        startActivity(attractionIntent);
+    }
+    public void white(View view){
+        Intent attractionIntent = new Intent(this, WhitePeer.class);
         startActivity(attractionIntent);
     }
 }
