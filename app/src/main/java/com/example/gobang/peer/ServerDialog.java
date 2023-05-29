@@ -25,76 +25,62 @@ public class ServerDialog {
     public ServerDialog(Context self){
         serverPort=new CompletableFuture<>();
         EditText portEditText = new EditText(self);
-        portEditText.setInputType(InputType.TYPE_CLASS_NUMBER); // Set input type to phone to show numeric keyboard
+        portEditText.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(self);
         dialogBuilder.setTitle("建立房間");
         dialogBuilder.setMessage("請輸入正整數作為 Port");
         dialogBuilder.setView(portEditText);
-        AlertDialog.Builder ok = dialogBuilder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-                int port;
-                try {
-                    port = Integer.parseInt(portEditText.getText().toString());
-                    if(port<=0)
-                        throw new Exception();
-                }catch (Exception e) {
-                    serverPort.complete(NOT_INT_ERROR);
-                    return;
-                }
-                List<String> ips;
-                try{
-                    ips = IPAddressUtil.getIPAddress();
-                    if(ips.size()==0){
-                        throw new Exception();
-                    }
-                }catch (Exception e){
-                    serverPort.complete(SOCKET_ERROR);
-                    return;
-                }
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(self);
-                dialogBuilder.setTitle("等待對手");
-                String msg="請讓對手輸入以下 ip 位址以進入房間\n";
-                for (String ip:ips) {
-                    msg+=ip+":"+port+"\n";
-                }
-                dialogBuilder.setMessage(msg);
-                dialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        Intent attractionIntent = new Intent(self, MainActivity.class);
-                        self.startActivity(attractionIntent);
-                    }
-                });
-                alertDialog = dialogBuilder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-                serverPort.complete(port);
+        AlertDialog.Builder ok = dialogBuilder.setPositiveButton("確定", (dialog, which) -> {
+            dialog.cancel();
+            int port;
+            try {
+                port = Integer.parseInt(portEditText.getText().toString());
+                if(port<=0)
+                    throw new Exception();
+            }catch (Exception e) {
+                serverPort.complete(NOT_INT_ERROR);
+                return;
             }
-        });
-
-        // Set the negative button and its click listener
-        dialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            List<String> ips;
+            try{
+                ips = IPAddressUtil.getIPAddress();
+                if(ips.size()==0){
+                    throw new Exception();
+                }
+            }catch (Exception e){
+                serverPort.complete(SOCKET_ERROR);
+                return;
+            }
+            AlertDialog.Builder dialogBuilder1 = new AlertDialog.Builder(self);
+            dialogBuilder1.setTitle("等待對手");
+            String msg="請讓對手輸入以下 ip 位址以進入房間\n";
+            for (String ip:ips) {
+                msg+=ip+":"+port+"\n";
+            }
+            dialogBuilder1.setMessage(msg);
+            dialogBuilder1.setNegativeButton("取消", (dialog1, which1) -> {
+                dialog1.cancel();
                 Intent attractionIntent = new Intent(self, MainActivity.class);
                 self.startActivity(attractionIntent);
-            }
+            });
+            alertDialog = dialogBuilder1.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+            serverPort.complete(port);
+        });
+        dialogBuilder.setNegativeButton("取消", (dialog, which) -> {
+            dialog.cancel();
+            Intent attractionIntent = new Intent(self, MainActivity.class);
+            self.startActivity(attractionIntent);
         });
         handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                alertDialog = dialogBuilder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-            }
+        handler.post(() -> {
+            alertDialog = dialogBuilder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
         });
     }
     public void cancel(){

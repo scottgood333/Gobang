@@ -10,7 +10,6 @@ public class WebSocket {
     public final InputStreamLV in;
     public final OutputStream out;
     public final Socket socket;
-    final Timer timer = new Timer();
     public WebSocket(Socket socket)throws IOException {
         in = new InputStreamLV(socket.getInputStream());
         out = socket.getOutputStream();
@@ -22,27 +21,6 @@ public class WebSocket {
         out.write(data.length>>8);
         out.write(data.length);
         out.write(data);
-    }
-    public void send(byte[] data, long timeout)throws Exception{
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run(){
-                close();
-            }
-        }, timeout);
-        send(data);
-        timer.cancel();
-    }
-    public byte[] receive(long timeout)throws Exception{
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run(){
-                close();
-            }
-        }, timeout);
-        byte[] data = receive();
-        timer.cancel();
-        return data;
     }
     public byte[] receive()throws Exception{
         byte[] data = in.readNBytes(4);

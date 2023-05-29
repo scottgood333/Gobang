@@ -2,12 +2,10 @@ package com.example.gobang.peer;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
-import android.util.Log;
 import android.widget.EditText;
 import com.example.gobang.MainActivity;
 
@@ -41,58 +39,46 @@ public class ClientDialog {
     public ClientDialog(Context self){
         hostInfo=new CompletableFuture<>();
         EditText portEditText = new EditText(self);
-        portEditText.setInputType(InputType.TYPE_CLASS_TEXT); // Set input type to phone to show numeric keyboard
+        portEditText.setInputType(InputType.TYPE_CLASS_TEXT);
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(self);
         dialogBuilder.setTitle("進入房間");
         dialogBuilder.setMessage("請輸入房間位址 (包含 port)");
         dialogBuilder.setView(portEditText);
-        AlertDialog.Builder ok = dialogBuilder.setPositiveButton("確定", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-                HostInfo temp;
-                try {
-                    temp=new HostInfo(portEditText.getText().toString());
-                }catch (Exception e) {
-                    hostInfo.complete(new HostInfo(FORMAT_ERROR));
-                    return;
-                }
-                AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(self);
-                dialogBuilder.setTitle("進入房間");
-                dialogBuilder.setMessage("正在嘗試連線");
-                AlertDialog.Builder ok = dialogBuilder.setPositiveButton("取消連線", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                        Intent attractionIntent = new Intent(self, MainActivity.class);
-                        self.startActivity(attractionIntent);
-                    }
-                });
-                alertDialog = dialogBuilder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-                hostInfo.complete(temp);
+        AlertDialog.Builder ok = dialogBuilder.setPositiveButton("確定", (dialog, which) -> {
+            dialog.cancel();
+            HostInfo temp;
+            try {
+                temp=new HostInfo(portEditText.getText().toString());
+            }catch (Exception e) {
+                hostInfo.complete(new HostInfo(FORMAT_ERROR));
+                return;
             }
-        });
-        dialogBuilder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
+            AlertDialog.Builder dialogBuilder1 = new AlertDialog.Builder(self);
+            dialogBuilder1.setTitle("進入房間");
+            dialogBuilder1.setMessage("正在嘗試連線");
+            AlertDialog.Builder ok1 = dialogBuilder1.setPositiveButton("取消連線", (dialog1, which1) -> {
+                dialog1.cancel();
                 Intent attractionIntent = new Intent(self, MainActivity.class);
                 self.startActivity(attractionIntent);
-            }
+            });
+            alertDialog = dialogBuilder1.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
+            hostInfo.complete(temp);
+        });
+        dialogBuilder.setNegativeButton("取消", (dialog, which) -> {
+            dialog.cancel();
+            Intent attractionIntent = new Intent(self, MainActivity.class);
+            self.startActivity(attractionIntent);
         });
         handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                alertDialog = dialogBuilder.create();
-                alertDialog.setCancelable(false);
-                alertDialog.setCanceledOnTouchOutside(false);
-                alertDialog.show();
-            }
+        handler.post(() -> {
+            alertDialog = dialogBuilder.create();
+            alertDialog.setCancelable(false);
+            alertDialog.setCanceledOnTouchOutside(false);
+            alertDialog.show();
         });
     }
     public void cancel(){
