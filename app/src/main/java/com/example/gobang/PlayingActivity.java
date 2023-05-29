@@ -35,6 +35,10 @@ public class PlayingActivity extends AppCompatActivity {
         chessBoard.reset();
     }
 
+    public  void repent_listener(View view){
+        chessBoard.repentChess();
+    }
+
     private AppCompatActivity self;
     /* Called by chessBoard when it is clicked
      * if color is 0 means no winner, ignore

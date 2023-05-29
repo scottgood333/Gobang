@@ -82,6 +82,11 @@ public class ChessBoardView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) (event.getX() / gridSize);
         int y = (int) (event.getY() / gridSize);
+
+        // 確保x, y 不會out of bound
+        if (x == 13){ x = 12;}
+        if (y == 13){ y = 12;}
+
         switch (event.getAction()) {
             case MotionEvent.ACTION_UP:
                 //下一子並且看有沒有人贏
@@ -102,6 +107,17 @@ public class ChessBoardView extends View {
     public void reset(){
         game.reset();
         parent.setTurnText("現在輪到:黑");
+        invalidate();
+    }
+
+    // 悔棋
+    public void repentChess(){
+        game.repentChess();
+        if(game.getRound()%2==0){
+            parent.setTurnText("現在輪到:黑");
+        }else{
+            parent.setTurnText("現在輪到:白");
+        }
         invalidate();
     }
 }

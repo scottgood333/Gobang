@@ -7,6 +7,8 @@ public class Gobang {
     public Gobang(){
         chessMap=new int[13][13];
         round=0;
+        lastMoveX=-1;
+        lastMoveY=-1;
     }
     public int getRound(){
         return round;
@@ -16,6 +18,8 @@ public class Gobang {
     }
     private int round;
     private final int[][] chessMap;
+
+    private  int lastMoveX, lastMoveY;
     /* 根據 round 下一子，回傳勝利方顏色，沒人勝利則傳 0 */
     public int placeChess(int x, int y) {
         if(chessMap[x][y]==0) {
@@ -24,6 +28,8 @@ public class Gobang {
             } else {
                 chessMap[x][y] = Color.WHITE;
             }
+            lastMoveX = x;
+            lastMoveY = y;
         }
         int l,r;
         for(l=0;x+l>=0&&chessMap[x+l][y]==chessMap[x][y];l--);
@@ -43,6 +49,13 @@ public class Gobang {
         if(r-l>5)
             return chessMap[x][y];
         return 0;
+    }
+    /* 悔棋，僅有一次悔棋機會*/
+    public void repentChess() {
+        if(lastMoveY==-1||lastMoveY==-1){return;}
+        chessMap[lastMoveX][lastMoveY] = 0;
+        lastMoveX = lastMoveY = -1;
+        round--;
     }
     public void reset(){
         for(int i=0;i<13;i++){
