@@ -20,7 +20,8 @@ public class Gobang {
     private final int[][] chessMap;
 
     private  int lastMoveX, lastMoveY;
-    /* 根據 round 下一子，回傳勝利方顏色，沒人勝利則傳 0 */
+    /* 根據 round 下一子，回傳勝利方顏色，沒人勝利則傳 0，滿子和局則回傳-2*/
+    /*黑色值: -16777216，白色值: -1*/
     public int placeChess(int x, int y) {
         if(chessMap[x][y]==0) {
             if ((round++) % 2 == 0) {
@@ -28,8 +29,13 @@ public class Gobang {
             } else {
                 chessMap[x][y] = Color.WHITE;
             }
+            Log.i("round: ", String.valueOf(round));
+            Log.i("color: ", String.valueOf(chessMap[x][y]));
             lastMoveX = x;
             lastMoveY = y;
+        }
+        if(round==169){
+            return -2;
         }
         int l,r;
         for(l=0;x+l>=0&&chessMap[x+l][y]==chessMap[x][y];l--);

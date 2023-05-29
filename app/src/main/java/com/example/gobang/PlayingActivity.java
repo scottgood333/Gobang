@@ -57,8 +57,11 @@ public class PlayingActivity extends AppCompatActivity {
         builder.setTitle("遊戲結束");
         if(color== Color.BLACK){
             builder.setMessage("黑色贏了!");
-        }else{
+        }else if(color==Color.WHITE) {
             builder.setMessage("白色贏了!");
+        }
+        else if(color==-2){
+            builder.setMessage("和局!");
         }
         builder.setPositiveButton("回主畫面", new DialogInterface.OnClickListener() {
             @Override
