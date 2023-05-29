@@ -91,6 +91,7 @@ public class ChessBoardView extends View {
             case MotionEvent.ACTION_UP:
                 //下一子並且看有沒有人贏
                 parent.showMessageIfWin(game.placeChess(x,y));
+                parent.setRepentMsgText("");
                 //現在是誰
                 if(game.getRound()%2==0){
                     parent.setTurnText("現在輪到:黑");
@@ -107,16 +108,23 @@ public class ChessBoardView extends View {
     public void reset(){
         game.reset();
         parent.setTurnText("現在輪到:黑");
+        parent.setRepentMsgText("");
         invalidate();
     }
 
     // 悔棋
     public void repentChess(){
-        game.repentChess();
+        int ret = game.repentChess();
         if(game.getRound()%2==0){
             parent.setTurnText("現在輪到:黑");
         }else{
             parent.setTurnText("現在輪到:白");
+        }
+        if (ret==-1){
+            parent.setRepentMsgText("你還沒有下棋！");
+        }
+        else if (ret==-2){
+            parent.setRepentMsgText("你只能悔棋一次！");
         }
         invalidate();
     }

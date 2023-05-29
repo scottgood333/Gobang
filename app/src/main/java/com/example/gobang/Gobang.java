@@ -51,11 +51,15 @@ public class Gobang {
         return 0;
     }
     /* 悔棋，僅有一次悔棋機會*/
-    public void repentChess() {
-        if(lastMoveY==-1||lastMoveY==-1){return;}
+    /* -1: 尚未開始對弈*/
+    /* -2: 此回合已悔棋過*/
+    public int repentChess() {
+        if(round==0){return -1;}
+        if(lastMoveX==-2||lastMoveY==-2){return -2;}
         chessMap[lastMoveX][lastMoveY] = 0;
-        lastMoveX = lastMoveY = -1;
+        lastMoveX = lastMoveY = -2;
         round--;
+        return 0;
     }
     public void reset(){
         for(int i=0;i<13;i++){

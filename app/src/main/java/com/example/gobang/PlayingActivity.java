@@ -1,5 +1,6 @@
 package com.example.gobang;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,18 +17,20 @@ import org.w3c.dom.Text;
 
 public class PlayingActivity extends AppCompatActivity {
     private ChessBoardView chessBoard;
-    private TextView turnView;
+    private TextView turnView, repentMsgView;
     /* Called by chessBoard when it is clicked
     * This method display this turn is whose turn */
     public void setTurnText(String text){
         turnView.setText(text);
     }
+    public void setRepentMsgText(String text){repentMsgView.setText(text);}
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playing);
         chessBoard = findViewById(R.id.imageView);
         turnView=findViewById(R.id.textView);
+        repentMsgView=findViewById(R.id.textView2);
         self=this;
         chessBoard.setParent(this);
     }
@@ -35,8 +38,11 @@ public class PlayingActivity extends AppCompatActivity {
         chessBoard.reset();
     }
 
-    public  void repent_listener(View view){
-        chessBoard.repentChess();
+    public  void repent_listener(View view){chessBoard.repentChess();}
+
+    public  void back_to_home_listener(View view){
+        Intent attractionIntent = new Intent(this, MainActivity.class);
+        startActivity(attractionIntent);
     }
 
     private AppCompatActivity self;
