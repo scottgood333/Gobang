@@ -19,7 +19,10 @@ public class Gobang {
     private int round;
     private final int[][] chessMap;
 
-    private  int lastMoveX, lastMoveY;
+    private int lastMoveX, lastMoveY;
+    public int[] getLastMove(){
+        return new int[]{lastMoveX,lastMoveY};
+    }
     /* 根據 round 下一子，回傳勝利方顏色，沒人勝利則傳 0，滿子和局則回傳-2*/
     /*黑色值: -16777216，白色值: -1*/
     public int placeChess(int x, int y) {
@@ -73,6 +76,7 @@ public class Gobang {
                 chessMap[i][j]=0;
             }
         }
+        lastMoveY=lastMoveY=-1;
         round=0;
     }
 }

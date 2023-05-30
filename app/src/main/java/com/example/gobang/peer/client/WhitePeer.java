@@ -22,16 +22,10 @@ import java.net.Socket;
 import java.util.concurrent.*;
 
 public class WhitePeer extends PeerActivity {
-    WhitePeer self;
-    private WebSocket anotherPlayer;
-    private ChessBoardASync player;
-    private TextView colorView;
-    private TextView statusView;
-    private Handler UIHandler;
-    private CreationDialog preDialog;
+
     @UiThread
     private void init(){
-        preDialog=new ClientDialog(self) {
+        CreationDialog preDialog=new ClientDialog(self) {
             @Override
             public void onCreate(String address, int port) {
                 switch (port){
@@ -80,9 +74,13 @@ public class WhitePeer extends PeerActivity {
             default:
                 return true;
         }
+        dotShow=false;
+        dotUpdateOnce();
+        statusView.setText("遊戲結束");
         return false;
     }
     private void loop(){
+        dotShow=true;
         statusView.setText("等待對手行動");
         webHandler.submit(()-> {
             byte[] point;
@@ -97,6 +95,8 @@ public class WhitePeer extends PeerActivity {
             UIHandler.post(()->{
                 int win=player.placeChess(point[0],point[1]);
                 if(ifContinue(win)){
+                    dotShow=false;
+                    dotUpdateOnce();
                     statusView.setText("輪到你了");
                     player.onChessPlaceOnce((x,y)->{
                         int win1=player.placeChess(x,y);
@@ -130,21 +130,8 @@ public class WhitePeer extends PeerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.peer);
-        self=this;
-        player=findViewById(R.id.imageView);
-        colorView =findViewById(R.id.textView);
         colorView.setText("你的顏色:白");
-        statusView=findViewById(R.id.textView4);
-        statusView.setText("");
-        UIHandler=new Handler(Looper.getMainLooper());
-        webHandler=Executors.newSingleThreadExecutor();
         webHandler.submit(()->Looper.prepare());
         init();
-    }
-
-    @Override
-    public void surrender(View view) {
-        anotherPlayer.close();
     }
 }
