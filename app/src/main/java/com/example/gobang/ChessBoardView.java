@@ -28,6 +28,7 @@ public class ChessBoardView extends View {
     private float gridSize;
     private final Gobang game;
     private PlayingActivity parent;
+    private final Paint redPaint;
     public ChessBoardView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
@@ -42,6 +43,9 @@ public class ChessBoardView extends View {
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
         circlePaint.setStrokeWidth(0f);
+
+        redPaint=new Paint();
+        redPaint.setColor(Color.RED);
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.chessboard);
     }
@@ -67,6 +71,11 @@ public class ChessBoardView extends View {
                 ,getWidth(),getHeight(),true);
         canvas.drawBitmap(res,0,0,mBitmapPaint);
         //到這邊
+
+        int[] point = game.getLastMove();
+        if(point[0]>=0){
+            canvas.drawRect(point[0]*gridSize+gridSize*0.1f, point[1]*gridSize+gridSize*0.1f, point[0]*gridSize+gridSize*0.9f, point[1]*gridSize+gridSize*0.9f, redPaint);
+        }
 
         //畫圓圈圈
         for(int x=0;x<13;x++){

@@ -15,54 +15,59 @@ import com.example.gobang.R;
 import com.example.gobang.peer.ChessBoardASync;
 import com.example.gobang.peer.CreationDialog;
 import com.example.gobang.peer.PeerActivity;
+import com.example.gobang.web.IPAddressUtil;
 import com.example.gobang.web.WebSocket;
 
 import java.net.ServerSocket;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BlackPeer extends PeerActivity {
-    BlackPeer self;
-    private WebSocket anotherPlayer;
-    private ChessBoardASync player;
-    private TextView statusView;
-    private TextView colorView;
-    private Handler UIHandler;
-    private CreationDialog preDialog;
-    @UiThread
     private void init(){
-        preDialog=new ServerDialog(self){
-            @Override
-            public void onCreate(int port) {
-                switch (port){
-                    case ServerDialog.NOT_INT_ERROR:
-                        toast("請輸入正整數");
-                        exit();
-                        return;
-                    case ServerDialog.THREAD_ERROR:
-                        toast("程序因未知原因中斷，請聯絡開發者");
-                        exit();
-                        return;
-                    case ServerDialog.SOCKET_ERROR:
-                        toast("無法取得 IP，請檢查你的網路功能");
-                        exit();
-                        return;
-                }
-                webHandler.submit(()->{
-                    try{
-                        ServerSocket server = new ServerSocket(port);
-                        anotherPlayer=new WebSocket(server.accept());
-                        server.close();
-                    }catch (Exception e){
-                        toast("房間建立失敗，請檢查你的網路功能");
-                        exit();
-                        return;
-                    }
-                    cancel();
-                    UIHandler.post(()->loop());
-                });
+        ServerSocket server=null;
+        int port;
+        for(port = 7777; port<=8080; port ++){
+            try{
+                server=new ServerSocket(port);
+            }catch (Exception e){
+                continue;
             }
-        };
+            break;
+        }
+        if(port==8881){
+            toast("建立失敗，檢查你的網路功能");
+            exit();
+            return;
+        }
+        List<String> ips;
+        try{
+            ips = IPAddressUtil.getIPAddress();
+            if(ips.size()==0){
+                throw new Exception();
+            }
+        }catch (Exception e){
+            toast("建立失敗，檢查你的網路功能");
+            exit();
+            return;
+        }
+        String msg="請讓對手輸入以下位址 (包含 port)\n";
+        for (String ip:ips) {
+            msg+=ip+":"+port+"\n";
+        }
+        CreationDialog preDialog=new CreationDialog(self);
+        final String msgFinal=msg;
+        UIHandler.post(()->preDialog.alert("等待對手",msgFinal,"取消",()->{
+            exit();
+        }));
+        try{
+            anotherPlayer=new WebSocket(server.accept());
+            preDialog.cancel();
+            UIHandler.post(()->loop());
+        }catch (Exception e){
+            toast("等待中斷，檢查你的網路功能");
+            exit();
+        }
     }
 
     private boolean ifContinue(int win){
@@ -86,13 +91,19 @@ public class BlackPeer extends PeerActivity {
             default:
                 return true;
         }
+        dotShow=false;
+        dotUpdateOnce();
+        statusView.setText("遊戲結束");
         return false;
     }
     private void loop(){
+        dotShow=false;
+        dotUpdateOnce();
         statusView.setText("輪到你了");
         player.onChessPlaceOnce((x,y)->{
             int win=player.placeChess(x,y);
             if(ifContinue(win)){
+                dotShow=true;
                 statusView.setText("等待對手行動");
                 webHandler.submit(()->{
                     byte[] point;
@@ -125,21 +136,10 @@ public class BlackPeer extends PeerActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.peer);
-        self=this;
-        player=findViewById(R.id.imageView);
-        colorView =findViewById(R.id.textView);
         colorView.setText("你的顏色:黑");
-        statusView=findViewById(R.id.textView4);
-        statusView.setText("");
-        UIHandler=new Handler(Looper.getMainLooper());
-        webHandler= Executors.newSingleThreadExecutor();
-        webHandler.submit(()->Looper.prepare());
-        init();
-    }
-
-    @Override
-    public void surrender(View view) {
-        anotherPlayer.close();
+        webHandler.submit(()->{
+            Looper.prepare();
+            init();
+        });
     }
 }
