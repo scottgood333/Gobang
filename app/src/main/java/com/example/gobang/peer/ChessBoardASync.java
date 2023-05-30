@@ -41,7 +41,7 @@ public class ChessBoardASync extends View {
         circlePaint.setColor(Color.BLACK);
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
-        circlePaint.setStrokeWidth(4f);
+        circlePaint.setStrokeWidth(0f);
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.chessboard);
     }
@@ -71,7 +71,7 @@ public class ChessBoardASync extends View {
         for(int x=0;x<13;x++){
             for(int y=0;y<13;y++){
                 circlePaint.setColor(game.getChessColor(x,y));
-                canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, 30, circlePaint);
+                canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, gridSize*0.4f, circlePaint);
             }
         }
     }

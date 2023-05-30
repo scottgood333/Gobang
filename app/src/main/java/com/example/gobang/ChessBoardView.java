@@ -32,7 +32,7 @@ public class ChessBoardView extends View {
         super(context, attrs);
         this.context = context;
         // chess
-        gridSize =getHeight()/13;
+        gridSize =(float)getHeight()/13;
         game=new Gobang();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         //畫點選畫面時顯示的圈圈
@@ -41,7 +41,7 @@ public class ChessBoardView extends View {
         circlePaint.setColor(Color.BLACK);
         circlePaint.setStyle(Paint.Style.FILL);
         circlePaint.setStrokeJoin(Paint.Join.MITER);
-        circlePaint.setStrokeWidth(4f);
+        circlePaint.setStrokeWidth(0f);
 
         background = BitmapFactory.decodeResource(getResources(), R.drawable.chessboard);
     }
@@ -55,7 +55,7 @@ public class ChessBoardView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         //初始化空畫布
-        gridSize =getHeight()/13;
+        gridSize =(float)getHeight()/13;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ChessBoardView extends View {
         for(int x=0;x<13;x++){
             for(int y=0;y<13;y++){
                 circlePaint.setColor(game.getChessColor(x,y));
-                canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, 30, circlePaint);
+                canvas.drawCircle(x*gridSize+gridSize/2, y*gridSize+gridSize/2, gridSize*0.4f, circlePaint);
             }
         }
     }
