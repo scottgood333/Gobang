@@ -5,8 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import com.example.gobang.peer.BlackPeer;
-import com.example.gobang.peer.WhitePeer;
+import com.example.gobang.peer.server.BlackPeer;
+import com.example.gobang.peer.client.WhitePeer;
 
 public class MainActivity extends AppCompatActivity {
 

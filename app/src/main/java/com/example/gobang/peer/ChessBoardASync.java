@@ -1,4 +1,4 @@
-package com.example.gobang.peer.chessboard;
+package com.example.gobang.peer;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,7 +18,9 @@ import com.example.gobang.Gobang;
 import com.example.gobang.R;
 
 public class ChessBoardASync extends View {
-
+    static public interface ChessPlaceHandler {
+        void run(byte x, byte y);
+    }
     Context context;
     private final Paint mBitmapPaint;
     private final Bitmap background;
@@ -29,7 +32,7 @@ public class ChessBoardASync extends View {
         super(context, attrs);
         this.context = context;
         // chess
-        gridSize =getHeight()/13;
+        gridSize =(float)getHeight()/13;
         game=new Gobang();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         //畫點選畫面時顯示的圈圈
@@ -47,10 +50,12 @@ public class ChessBoardASync extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         //初始化空畫布
-        gridSize =getHeight()/13;
+        gridSize =(float)getHeight()/13;
     }
     public int placeChess(int x,int y){
-        return game.placeChess(x,y);
+        int temp = game.placeChess(x,y);
+        invalidate();
+        return temp;
     }
     @Override
     protected void onDraw(Canvas canvas) {
@@ -71,7 +76,6 @@ public class ChessBoardASync extends View {
         }
     }
     private ChessPlaceHandler chessPlaceHandler =null;
-    /* 不要讓 android event loop 的 thread call 這個 function，會 block */
     public void onChessPlaceOnce(ChessPlaceHandler chessPlaceHandler){
         this.chessPlaceHandler = chessPlaceHandler;
     }
@@ -85,9 +89,9 @@ public class ChessBoardASync extends View {
         if (x == 13){ x = 12;}
         if (y == 13){ y = 12;}
         // 確保這個落點是合理的，並且 getTouchPointSync 正在等
-        if(event.getAction()==MotionEvent.ACTION_UP&&game.getChessColor(x,y)!=0&&chessPlaceHandler!=null){
-            chessPlaceHandler.run(x,y);
-            chessPlaceHandler=null;
+        if (event.getAction() == MotionEvent.ACTION_UP && game.getChessColor(x, y) == 0 && chessPlaceHandler != null) {
+            chessPlaceHandler.run(x, y);
+            chessPlaceHandler = null;
         }
         invalidate();
         return true;
