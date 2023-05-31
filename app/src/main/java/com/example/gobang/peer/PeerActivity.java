@@ -32,11 +32,6 @@ abstract public class PeerActivity extends AppCompatActivity {
     }
     protected ExecutorService webHandler;
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        webHandler.shutdown();
-    }
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.peer);
@@ -70,7 +65,8 @@ abstract public class PeerActivity extends AppCompatActivity {
         dotView.setText(temp);
     }
     public void surrender(View view) {
-        anotherPlayer.close();
         exit();
+        anotherPlayer.close();
+        webHandler.shutdown();
     }
 }

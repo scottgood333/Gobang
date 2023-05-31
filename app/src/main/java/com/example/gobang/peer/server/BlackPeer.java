@@ -24,8 +24,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class BlackPeer extends PeerActivity {
+    ServerSocket server;
     private void init(){
-        ServerSocket server=null;
+        server=null;
         int port;
         for(port = 7777; port<=8080; port ++){
             try{
@@ -58,14 +59,23 @@ public class BlackPeer extends PeerActivity {
         CreationDialog preDialog=new CreationDialog(self);
         final String msgFinal=msg;
         UIHandler.post(()->preDialog.alert("等待對手",msgFinal,"取消",()->{
+            webHandler.submit(()->{
+                try{
+                    server.close();
+                }catch (Exception e){
+                    Log.i("ERROR",e.toString());
+                }
+            });
             exit();
         }));
         try{
             anotherPlayer=new WebSocket(server.accept());
+            server.close();
             preDialog.cancel();
             UIHandler.post(()->loop());
         }catch (Exception e){
             toast("等待中斷，檢查你的網路功能");
+            Log.i("ERROR",e.toString());
             exit();
         }
     }
